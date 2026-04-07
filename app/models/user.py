@@ -8,4 +8,4 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
     is_blocked = Column(Boolean, default=False)
-    pending_fines = Column(float, default=0.0)
+    pending_fines = Column(Float, default=0.0)
