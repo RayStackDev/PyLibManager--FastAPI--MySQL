@@ -1,5 +1,9 @@
 from logging.config import fileConfig
 from app.database import Base
+from app.models.user import User
+from app.models.book import Book
+from app.models.loan import Loan
+
 target_metadata = Base.metadata
 
 from sqlalchemy import engine_from_config
