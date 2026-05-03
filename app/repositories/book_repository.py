@@ -18,3 +18,8 @@ class BookRepository:
         self.db.commit()
         self.db.refresh(db_book)
         return db_book
+    
+    def search_books(self, query: str):
+        return self.db.query(Book).filter(
+            (Book.title.contains(query)) | (Book.author.contains(query))
+        ).all()
