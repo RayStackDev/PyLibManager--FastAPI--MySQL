@@ -14,3 +14,12 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado no sistema")
     return repo.create(user)
+
+@router.get("/{user_id}", response_model=UserResponse)
+def read_user(user_id: int, db: Session = Depends(get_db)):
+    repo = UserRepository(db)
+    db_user = repo.get_by_id(user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    return db_user
+    
