@@ -14,7 +14,7 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="ISBN já cadastrado")
     return repo.create(book)
 
-@router.get("/", response_model=[BookResponse])
+@router.get("/", response_model=List[BookResponse])
 def list_book(db: Session = Depends(get_db)):
     repo = BookRepository(db)
     return repo.get_all()
