@@ -1,10 +1,10 @@
 from fastapi import FastAPI
+from app.routers import user_routes, book_routes
 
-app = FastAPI(
-    title="PyLibManager",
-    description="API para Gerenciamento de biblioteca",
-    version="1.0.0" 
-)
+app = FastAPI(title="PyLibManager")
+
+app.include_router(user_routes.router)
+app.include_router(book_routes.router)
 
 @app.get("/")
 def read_root():
