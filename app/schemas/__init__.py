@@ -1,2 +1,2 @@
 from .user import UserCreate, UserResponse
-from .book import BookCreate, UserResponse
+from .book import BookCreate, BookResponse
