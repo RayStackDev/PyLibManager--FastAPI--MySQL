@@ -12,6 +12,9 @@ class BookRepository:
     def get_by_isbn(self, isbn: str):
         return self.db.query(Book).filter(Book.isbn == isbn).first()
     
+    def get_by_id(self, book_id: int):
+        return self.db.query(Book).filter(Book.id == book_id).first()
+    
     def create(self, book: BookCreate):
         db_book = Book(**book.model_dump())
         self.db.add(db_book)
