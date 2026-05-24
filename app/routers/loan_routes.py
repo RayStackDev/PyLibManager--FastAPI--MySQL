@@ -11,13 +11,12 @@ router = APIRouter(prefix="/loans", tags=["Loans"])
 @router.post("/", response_model=LoanResponse)
 def create_loan(loan: LoanCreate, db: Session = Depends(get_db)):
     book_repo = BookRepository(db)
-    db_book = book_repo.get_all()
 
-    book = next((b for b in db_book if b.id == loan.book_id), None)
+    book = book_repo.get_by_id(loan.book_id)
 
     if not book:
         raise HTTPException(status_code=404, detail="Livro nao encontrado")
-    if book.stock:
+    if book.stock <= 0:
         raise HTTPException(status_code=400, detail="Livro esgotado no estoque")
     
 
