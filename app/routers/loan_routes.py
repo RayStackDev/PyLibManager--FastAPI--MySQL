@@ -16,7 +16,7 @@ def create_loan(loan: LoanCreate, db: Session = Depends(get_db)):
     book = next((b for b in db_book if b.id == loan.book_id), None)
 
     if not book:
-        raise HTTPException(status_code=44, detail="Livro nao encontrado")
+        raise HTTPException(status_code=404, detail="Livro nao encontrado")
     if book.stock:
         raise HTTPException(status_code=400, detail="Livro esgotado no estoque")
     
