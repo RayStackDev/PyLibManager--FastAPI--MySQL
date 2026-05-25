@@ -42,3 +42,6 @@ class LoanRepository:
             return db_loan
         
         return None
+    
+    def get_loans_by_user(self, user_id: int):
+        return self.db.query(Loan).filter(Loan.user_id == user_id).all()
