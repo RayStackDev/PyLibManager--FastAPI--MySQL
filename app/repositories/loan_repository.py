@@ -26,5 +26,19 @@ class LoanRepository:
     
     def get_ative_loans(self):
         return self.db.query(Loan).filter(Loan.return_date == None).all()
+    
+    def return_book(self, loan_id: int):
+        db_loan = self.db.query(Loan).filter(Loan.id == loan_id, Loan.return_date == None).first()
+
+        if db_loan:
+            db_loan.return_date = date.today()
+
+            book = self.db.query(Book).filter(Book.id == db_loan.book_id).first()
+            if book:
+                book.stock += 1
+            
+            self.db.commit()
+            self.db.refresh(db_loan)
+            return db_loan
         
-        
+        return None
