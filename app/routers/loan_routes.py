@@ -41,3 +41,9 @@ def return_book_route(loan_id: int, db: Session = Depends(get_db)):
         )
     
     return updated_loan
+
+@router.get("/user/{user_id}", response_model=List[LoanResponse])
+def get_user_loans_route(user_id: int, db: Session = Depends(get_db)):
+    loan_repo = LoanRepository(db)
+    loans = loan_repo.get_loans_by_user(user_id)
+    return loans
