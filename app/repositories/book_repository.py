@@ -24,5 +24,14 @@ class BookRepository:
     
     def search_books(self, query: str):
         return self.db.query(Book).filter(
-            (Book.title.contains(query)) | (Book.author.contains(query))
-        ).all()
+            (Book.title.contains(query)) | (Book.author.contains(query))).all()
+    
+    def delete_book(self, book_id: int):
+        db_book = self.get_by_id(book_id)
+
+        if db_book:
+            self.db.delete(db_book)
+            self.db.commit()
+            return True
+        
+        return False
