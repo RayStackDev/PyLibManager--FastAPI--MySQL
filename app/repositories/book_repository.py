@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.book import Book
+from app.models.loan import Loan
 from app.schemas.book import BookCreate
 
 class BookRepository:
@@ -30,8 +31,13 @@ class BookRepository:
         db_book = self.get_by_id(book_id)
 
         if db_book:
+
+            has_loans = self.db.query(Loan).filter(Loan.book_id == book_id).first()
+            if has_loans:
+                return "has_relationships"
+            
             self.db.delete(db_book)
             self.db.commit()
-            return True
+            return "success"
         
-        return False
+        return "not_found"

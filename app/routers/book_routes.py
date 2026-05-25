@@ -24,3 +24,19 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
     if repo.get_by_isbn(book.isbn):
         raise HTTPException(status_code=400, detail="ISBN já cadastrado")
     return repo.create(book)
+
+@router.delete("/{book_id}")
+def delete_book_route(book_id: int, db: Session = Depends(get_db)):
+    repo = BookRepository(db)
+
+    result = repo.delete_book(book_id)
+
+    if result == "not_found":
+        raise HTTPException(status_code=404, detail="Livro nao encontrado")
+    elif result == "has_relationships":
+        raise HTTPException(
+            status_code=400,
+            detail="Não é possivel deletar este livro pois ele possui historico de emprestimos ativo"
+        )
+    
+    return {"detail": "Livro deletado com sucesso"}
