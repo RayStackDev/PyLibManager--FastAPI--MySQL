@@ -22,4 +22,15 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     return db_user
+
+@router.put("/{user_id}", response_model=UserResponse)
+def update_user_route(user_id: int, user_data: UserCreate, db: Session = Depends(get_db)):
+    repo = UserRepository(db)
+
+    updated_user = repo.update_user(user_id, user_data.model_dump())
+
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Usuario nao encontrado")
+    
+    return updated_user
     
