@@ -27,3 +27,17 @@ def create_loan(loan: LoanCreate, db: Session = Depends(get_db)):
 def list_active_loans(db: Session = Depends(get_db)):
     repo = LoanRepository(db)
     return repo.get_ative_loans()
+
+@router.post("/{loan_id}/return", response_model=LoanResponse)
+def return_book_route(loan_id: int, db: Session = Depends(get_db)):
+    loan_repo = LoanRepository(db)
+
+    updated_loan = loan_repo.return_book(loan_id)
+
+    if not updated_loan:
+        raise HTTPException(
+            status_code=400,
+            detail="Emprestimo nao encontrado ou livro ja devolvido"
+        )
+    
+    return updated_loan
