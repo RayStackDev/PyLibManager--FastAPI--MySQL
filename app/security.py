@@ -1,7 +1,12 @@
+import jwt
+from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = "sua_chave_secreta_super_segura_aqui"
+ALGORITHM = "HS256"
+ACESS_TOKEN_EXPIRE_MINUTES = 30
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class SecurityUtils:
     @staticmethod
     def generate_password_hash(password: str) -> str:
@@ -10,3 +15,16 @@ class SecurityUtils:
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         return pwd_context.verify(plain_password, hashed_password)
+    
+    @staticmethod
+    def create_access_token(data:dict) -> str:
+
+        to_encode = data.copy()
+
+        expire = data.time.now(timezone.utc) + timedelta(minutes=ACESS_TOKEN_EXPIRE_MINUTES)
+
+        to_encode.update({"exp": expire})
+
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+        return encoded_jwt
