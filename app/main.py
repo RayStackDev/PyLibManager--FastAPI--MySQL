@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import user_routes, book_routes, loan_routes
+from app.routers import user_routes, book_routes, loan_routes, auth_routes
 
 app = FastAPI(title="PyLibManager")
 
