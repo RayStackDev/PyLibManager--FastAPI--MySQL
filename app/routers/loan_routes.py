@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_db
+from app.dependencies import get_db, get_current_user
+from app.models.user import User
 from app.schemas.loan import LoanCreate, LoanResponse
 from app.repositories.loan_repository import LoanRepository
 from app.repositories.book_repository import BookRepository
@@ -9,7 +10,7 @@ from app.repositories.book_repository import BookRepository
 router = APIRouter(prefix="/loans", tags=["Loans"])
 
 @router.post("/", response_model=LoanResponse)
-def create_loan(loan: LoanCreate, db: Session = Depends(get_db)):
+def create_loan(loan: LoanCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     book_repo = BookRepository(db)
 
     book = book_repo.get_by_id(loan.book_id)
