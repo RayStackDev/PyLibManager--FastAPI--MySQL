@@ -13,7 +13,7 @@ class UserRepository:
         return self.db.query(User).filter(User.email == email).first()
     
     def create(self, user: UserCreate):
-        db_user = User(name=user.name, email=user.email)
+        db_user = User(name=user.name, email=user.email, password=user.password)
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
