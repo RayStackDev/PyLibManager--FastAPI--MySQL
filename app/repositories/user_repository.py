@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate
+from app.core.security import SecurityUtils
 
 class UserRepository:
     def __init__(self, db: Session):
@@ -13,7 +14,13 @@ class UserRepository:
         return self.db.query(User).filter(User.email == email).first()
     
     def create(self, user: UserCreate):
-        db_user = User(name=user.name, email=user.email, password=user.password)
+        hashed_password = SecurityUtils.generate_password_hash(user.password)
+        
+        db_user = User(
+            name=user.name, 
+            email=user.email, 
+            password=hashed_password
+        )
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
