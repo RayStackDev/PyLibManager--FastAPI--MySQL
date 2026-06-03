@@ -22,7 +22,7 @@ def create_loan(loan: LoanCreate, db: Session = Depends(get_db), current_user: U
     
 
     loan_repo = LoanRepository(db)
-    return loan_repo.create_loan(loan)
+    return loan_repo.create_loan(loan, user_id=current_user.id)
 
 @router.get("/", response_model=List[LoanResponse])
 def list_active_loans(db: Session = Depends(get_db)):
