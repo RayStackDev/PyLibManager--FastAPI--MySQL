@@ -8,9 +8,9 @@ class LoanRepository:
     def __init__(self, db: Session):
         self.db = db
     
-    def create_loan(self, loan_data: LoanCreate):
+    def create_loan(self, loan_data: LoanCreate, user_id: int):
         db_loan = Loan(
-            user_id=loan_data.user_id,
+            user_id=user_id,
             book_id=loan_data.book_id,
             loan_date=date.today()
         )
@@ -27,8 +27,12 @@ class LoanRepository:
     def get_ative_loans(self):
         return self.db.query(Loan).filter(Loan.return_date == None).all()
     
-    def return_book(self, loan_id: int):
-        db_loan = self.db.query(Loan).filter(Loan.id == loan_id, Loan.return_date == None).first()
+    def return_book(self, loan_id: int, user_id: int):
+        db_loan = self.db.query(Loan).filter(
+            Loan.id == loan_id, 
+            Loan.user_id == user_id,
+            Loan.return_date == None
+        ).first()
 
         if db_loan:
             db_loan.return_date = date.today()
