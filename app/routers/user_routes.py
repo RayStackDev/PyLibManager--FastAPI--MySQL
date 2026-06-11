@@ -1,14 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_db
+from app.dependencies import get_db, get_current_user
+from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 from app.repositories.user_repository import UserRepository
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("/", response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+def create_user(
+    user: UserCreate, 
+    db: Session = Depends(get_db)
+):
     repo = UserRepository(db)
     db_user = repo.get_by_email(user.email)
     if db_user:
@@ -16,7 +20,17 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return repo.create(user)
 
 @router.get("/{user_id}", response_model=UserResponse)
-def read_user(user_id: int, db: Session = Depends(get_db)):
+def read_user(
+    user_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user) 
+):
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Ação não permitida. Você só pode visualizar o seu própio perfil."
+        )
+    
     repo = UserRepository(db)
     db_user = repo.get_by_id(user_id)
     if not db_user:
@@ -24,7 +38,10 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 @router.put("/{user_id}", response_model=UserResponse)
-def update_user_route(user_id: int, user_data: UserCreate, db: Session = Depends(get_db)):
+def update_user_route(
+    user_id: int, user_data: UserCreate, 
+    db: Session = Depends(get_db)
+):
     repo = UserRepository(db)
 
     updated_user = repo.update_user(user_id, user_data.model_dump())
