@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_db
+from app.dependencies import get_db, get_current_user
+from app.models.user import User
 from app.schemas.book import BookCreate, BookResponse
 from app.repositories.book_repository import BookRepository
 
@@ -19,7 +20,11 @@ def search_books_route(query: str = Query(..., min_length=1, description="Termo 
     return books
 
 @router.post("/", response_model=BookResponse)
-def create_book(book: BookCreate, db: Session = Depends(get_db)):
+def create_book(
+    book: BookCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     repo = BookRepository(db)
     if repo.get_by_isbn(book.isbn):
         raise HTTPException(status_code=400, detail="ISBN já cadastrado")
