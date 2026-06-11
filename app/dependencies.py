@@ -28,7 +28,13 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
         if user_id is None:
             raise credentials_exception
-        
+    
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sua sessão expirou. Por favor, faça login novamente.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except jwt.PyJWTError:
         raise credentials_exception
 
