@@ -43,8 +43,13 @@ def return_book_route(loan_id: int, db: Session = Depends(get_db)):
     
     return updated_loan
 
-@router.get("/user/{user_id}", response_model=List[LoanResponse])
-def get_user_loans_route(user_id: int, db: Session = Depends(get_db)):
+@router.get("/my-loans", response_model=List[LoanResponse])
+def get_logged_user_loans( 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+    ):
+
     loan_repo = LoanRepository(db)
-    loans = loan_repo.get_loans_by_user(user_id)
+    loans = loan_repo.get_loans_by_user(user_id=current_user.id)
+    
     return loans
