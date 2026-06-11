@@ -19,6 +19,7 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
         )
     
     token_data = {"sub": str(user.id), "email": user.email}
-    access_token = SecurityUtils.create_access_token(data={"sub": user.email})
+
+    access_token = SecurityUtils.create_access_token(data=token_data)
 
     return {"access_token": access_token, "token_type": "bearer"}
