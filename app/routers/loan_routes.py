@@ -25,7 +25,11 @@ def create_loan(loan: LoanCreate, db: Session = Depends(get_db), current_user: U
     return loan_repo.create_loan(loan, user_id=current_user.id)
 
 @router.get("/", response_model=List[LoanResponse])
-def list_active_loans(db: Session = Depends(get_db)):
+def list_active_loans(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+    ):
+    
     repo = LoanRepository(db)
     return repo.get_ative_loans()
 
@@ -51,5 +55,5 @@ def get_logged_user_loans(
 
     loan_repo = LoanRepository(db)
     loans = loan_repo.get_loans_by_user(user_id=current_user.id)
-    
+
     return loans
