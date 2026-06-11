@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from app.core.security import SecurityUtils
 from sqlalchemy.orm import Session
 from typing import List
 from app.dependencies import get_db, get_current_user
@@ -17,6 +18,9 @@ def create_user(
     db_user = repo.get_by_email(user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado no sistema")
+
+    user.password = SecurityUtils.generate_password_hash(user.password)
+
     return repo.create(user)
 
 @router.get("/{user_id}", response_model=UserResponse)
