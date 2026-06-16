@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_db, get_current_user
+from app.dependencies import get_db, get_current_admin
 from app.models.user import User
 from app.schemas.book import BookCreate, BookResponse
 from app.repositories.book_repository import BookRepository
@@ -23,7 +23,7 @@ def search_books_route(query: str = Query(..., min_length=1, description="Termo 
 def create_book(
     book: BookCreate, 
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_admin: User = Depends(get_current_admin)
 ):
     repo = BookRepository(db)
     if repo.get_by_isbn(book.isbn):
@@ -31,9 +31,12 @@ def create_book(
     return repo.create(book)
 
 @router.delete("/{book_id}")
-def delete_book_route(book_id: int, db: Session = Depends(get_db)):
+def delete_book_route(
+    book_id: int, 
+    db: Session = Depends(get_db),
+    current_admin: User =  Depends(get_current_admin)
+):
     repo = BookRepository(db)
-
     result = repo.delete_book(book_id)
 
     if result == "not_found":
