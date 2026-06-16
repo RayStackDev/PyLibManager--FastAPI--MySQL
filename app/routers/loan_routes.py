@@ -11,8 +11,19 @@ router = APIRouter(prefix="/loans", tags=["Loans"])
 
 @router.post("/", response_model=LoanResponse)
 def create_loan(loan: LoanCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.is_blocked:
+        raise HTTPException(
+            status_code=403,
+            detail="Operação negada. Sua conta na biblioteca está suspensa ou bloqueada"
+        )
+    
+    if current_user.pending_fines > 0.0:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Operação Negada. Você possui multas pendentes no valor de RS {current_user.pending_fines:.2f}"
+        )
+    
     book_repo = BookRepository(db)
-
     book = book_repo.get_by_id(loan.book_id)
 
     if not book:
@@ -20,7 +31,6 @@ def create_loan(loan: LoanCreate, db: Session = Depends(get_db), current_user: U
     if book.stock <= 0:
         raise HTTPException(status_code=400, detail="Livro esgotado no estoque")
     
-
     loan_repo = LoanRepository(db)
     return loan_repo.create_loan(loan, user_id=current_user.id)
 
