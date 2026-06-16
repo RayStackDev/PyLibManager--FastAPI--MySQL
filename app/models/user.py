@@ -9,4 +9,5 @@ class User(Base):
     email = Column(String(100), unique=True, index=True, nullable=False)
     is_blocked = Column(Boolean, default=False)
     pending_fines = Column(Float, default=0.0)
+    is_admin = Column(Boolean, default=False)
     password = Column(String(255), nullable=False)
