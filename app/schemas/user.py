@@ -7,12 +7,12 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    pass
 
 class UserResponse(UserBase):
     id: int
     is_blocked: bool
     pending_fines: float
+    is_admin: bool
 
     class Config:
         from_attributes = True
