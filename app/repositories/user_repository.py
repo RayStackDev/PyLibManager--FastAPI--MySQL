@@ -16,10 +16,10 @@ class UserRepository:
     def create(self, user: UserCreate):
         hashed_password = SecurityUtils.generate_password_hash(user.password)
         
-        db_user = User(
+        db_user = User (
             name=user.name, 
             email=user.email, 
-            password=hashed_password
+            password=hashed_password,
             is_admin=False
         )
         self.db.add(db_user)
