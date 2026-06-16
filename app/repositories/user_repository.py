@@ -20,6 +20,7 @@ class UserRepository:
             name=user.name, 
             email=user.email, 
             password=hashed_password
+            is_admin=False
         )
         self.db.add(db_user)
         self.db.commit()
@@ -36,7 +37,7 @@ class UserRepository:
                     setattr(db_user, key, value)
             
             self.db.commit()
-            self.db. refresh(db_user)
+            self.db.refresh(db_user)
             return db_user
         
         return None
