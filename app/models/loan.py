@@ -10,6 +10,7 @@ class Loan(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     book_id = Column(Integer, ForeignKey("books.id"))
     loan_date = Column(Date, default=datetime.utcnow)
+    due_date = Column(Date, nullable=False)
     return_date = Column(Date, nullable=True)
 
     user = relationship("User")
