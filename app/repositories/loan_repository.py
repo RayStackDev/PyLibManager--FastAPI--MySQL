@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.loan import Loan
 from app.models.book import Book
+from app.models.user import User
 from app.schemas.loan import LoanCreate
 from datetime import date, timedelta
 
@@ -38,8 +39,19 @@ class LoanRepository:
         ).first()
 
         if db_loan:
-            db_loan.return_date = date.today()
+            today = date.today()
+            db_loan.return_date = today
 
+            if today > db_loan.due_date:
+                dias_atraso = (today - db_loan.due_date).days
+                valor_multa_diaria = 2.00
+                total_multa = dias_atraso * valor_multa_diaria
+
+                usuario = self.db.query(User).filter(User.id == db_loan.user_id).first()
+                if usuario:
+                    usuario.pending_fines += total_multa
+
+                    
             book = self.db.query(Book).filter(Book.id == db_loan.book_id).first()
             if book:
                 book.stock += 1
