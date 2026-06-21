@@ -48,3 +48,30 @@ def delete_book_route(
         )
     
     return {"detail": "Livro deletado com sucesso"}
+
+@router.get("/inventory-report")
+def get_inventory_report(
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+    repo = BookRepository(db)
+    books = repo.get_all()
+
+    report = []
+    for book in books:
+        if book.stock == 0:
+            status_estoque = "Esgotado"
+        elif book.stock <= 2:
+            status_estoque = "Critico (Necessita Reposição)"
+        else:
+            status_estoque = "Estavel"
+        
+        report.append({
+            "book_id": book.id,
+            "title": book.title,
+            "isbn": book.isbn,
+            "current_stock": book.stock,
+            "status": status_estoque
+        })
+    
+    return report
