@@ -82,3 +82,22 @@ def unblock_user_route(
         raise HTTPException(status_code=404, detail="Usuario nao encontrando")
     
     return updated_user
+
+@router.put("{user_id}/pay-fines", response_model=UserResponse)
+def pay_user_fines_route(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+    repo = UserRepository(db)
+
+    db_user = repo.get_by_id(user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Usuario nao encontrado")
+    
+    if db_user.pending_fines == 0.0:
+        raise HTTPException(status_code=400, detail="Este usuario não possui multas pendentes.")
+    
+    updated_user = repo.update_user(user_id, {"pending_fines": 0.0})
+
+    return updated_user
