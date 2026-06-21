@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.core.security import SecurityUtils
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_db, get_current_user
+from app.dependencies import get_db, get_current_user, get_current_admin
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 from app.repositories.user_repository import UserRepository
@@ -55,3 +55,16 @@ def update_user_route(
     
     return updated_user
     
+@router.put("/{user_id}/block", response_model=UserResponse)
+def block_user_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+    repo = UserRepository(db)
+    updated_user = repo.update_user(user_id, {"is_blocked": True})
+
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Usuario não encontrado")
+    
+    return updated_user
