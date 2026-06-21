@@ -64,3 +64,9 @@ class LoanRepository:
     
     def get_loans_by_user(self, user_id: int):
         return self.db.query(Loan).filter(Loan.user_id == user_id).all()
+    
+    def get_overdue_loans(self):
+        return self.db.query(Loan).filter(
+            Loan.return_date == None,
+            Loan.due_date < date.today()
+        ).all()

@@ -75,3 +75,11 @@ def get_logged_user_loans(
     loans = loan_repo.get_loans_by_user(user_id=current_user.id)
 
     return loans
+
+@router.get("/overdue", response_model=List[LoanResponse])
+def list_overdue_loans(
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+    repo = LoanRepository(db)
+    return repo.get_overdue_loans()
