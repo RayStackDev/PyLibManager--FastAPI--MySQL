@@ -42,7 +42,7 @@ def create_loan(
 @router.get("/", response_model=List[LoanResponse])
 def list_active_loans(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_admin)
     ):
     
     repo = LoanRepository(db)
