@@ -68,3 +68,17 @@ def block_user_user(
         raise HTTPException(status_code=404, detail="Usuario não encontrado")
     
     return updated_user
+
+@router.put("/{user_id}/unblock", response_model=UserResponse)
+def unblock_user_route(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+    repo = UserRepository(db)
+    updated_user = repo.update_user(user_id, {"is_blocked": False})
+
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Usuario nao encontrando")
+    
+    return updated_user
