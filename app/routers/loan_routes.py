@@ -42,7 +42,7 @@ def create_loan(
 @router.get("/", response_model=List[LoanResponse])
 def list_active_loans(
     skip: int = Query(0, ge=0, description="Numero de registros a pular (offset)"),
-    limit: int = Query(10, ge=10, le=100, description="Quantidade maxima de registro por pagina"),
+    limit: int = Query(10, ge=1, le=100, description="Quantidade maxima de registro por pagina"),
     db: Session = Depends(get_db),
     current_admin: User = Depends(get_current_admin)
     ):
