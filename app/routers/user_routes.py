@@ -6,6 +6,7 @@ from app.dependencies import get_db, get_current_user, get_current_admin
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 from app.repositories.user_repository import UserRepository
+from app.services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -14,14 +15,8 @@ def create_user(
     user: UserCreate, 
     db: Session = Depends(get_db)
 ):
-    repo = UserRepository(db)
-    db_user = repo.get_by_email(user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email já cadastrado no sistema")
-
-    user.password = SecurityUtils.generate_password_hash(user.password)
-
-    return repo.create(user)
+    service = UserService(db)
+    return service.create_user(user)
 
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user(
