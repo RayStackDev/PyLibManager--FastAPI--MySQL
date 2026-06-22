@@ -70,3 +70,9 @@ class LoanRepository:
             Loan.return_date == None,
             Loan.due_date < date.today()
         ).all()
+    
+    def count_active_loans_by_user(self, user_id: int) -> int:
+        return self.db.query(Loan).filter(
+            Loan.user_id == user_id,
+            Loan.return_date == None
+        ).count()
