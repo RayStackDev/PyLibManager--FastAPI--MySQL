@@ -28,6 +28,15 @@ def create_loan(
             detail=f"Operação Negada. Você possui multas pendentes no valor de RS {current_user.pending_fines:.2f}"
         )
     
+    loan_repo = LoanRepository(db)
+
+    active_loans_count = loan_repo.count_active_loans_by_user(current_user.id)
+    if active_loans_count >= 3:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Operação negada. Você já possui {active_loans_count}"
+        )
+    
     book_repo = BookRepository(db)
     book = book_repo.get_by_id(loan.book_id)
 
