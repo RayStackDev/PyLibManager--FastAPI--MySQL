@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
+from app.services.loan_service import LoanService
 from app.dependencies import get_db, get_current_user, get_current_admin
 from app.models.user import User
 from app.schemas.loan import LoanCreate, LoanResponse
@@ -15,38 +16,8 @@ def create_loan(
     db: Session = Depends(get_db), 
     current_user: User = Depends(get_current_user)
 ):
-    
-    if current_user.is_blocked:
-        raise HTTPException(
-            status_code=403,
-            detail="Operação negada. Sua conta na biblioteca está suspensa ou bloqueada"
-        )
-    
-    if current_user.pending_fines > 0.0:
-        raise HTTPException(
-            status_code=403,
-            detail=f"Operação Negada. Você possui multas pendentes no valor de RS {current_user.pending_fines:.2f}"
-        )
-    
-    loan_repo = LoanRepository(db)
-
-    active_loans_count = loan_repo.count_active_loans_by_user(current_user.id)
-    if active_loans_count >= 3:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Operação negada. Você já possui {active_loans_count}"
-        )
-    
-    book_repo = BookRepository(db)
-    book = book_repo.get_by_id(loan.book_id)
-
-    if not book:
-        raise HTTPException(status_code=404, detail="Livro nao encontrado")
-    if book.stock <= 0:
-        raise HTTPException(status_code=400, detail="Livro esgotado no estoque")
-    
-    loan_repo = LoanRepository(db)
-    return loan_repo.create_loan(loan, user_id=current_user.id)
+    service = LoanService(db)
+    return service.create_loan(loan, current_user)
 
 @router.get("/", response_model=List[LoanResponse])
 def list_active_loans(
