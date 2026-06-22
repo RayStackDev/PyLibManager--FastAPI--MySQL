@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
 from app.dependencies import get_db, get_current_user, get_current_admin
@@ -41,12 +41,14 @@ def create_loan(
 
 @router.get("/", response_model=List[LoanResponse])
 def list_active_loans(
+    skip: int = Query(0, ge=0, description="Numero de registros a pular (offset)"),
+    limit: int = Query(10, ge=10, le=100, description="Quantidade maxima de registro por pagina"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin)
+    current_admin: User = Depends(get_current_admin)
     ):
     
     repo = LoanRepository(db)
-    return repo.get_ative_loans()
+    return repo.get_ative_loans(skip=skip, limit=limit)
 
 @router.post("/{loan_id}/return", response_model=LoanResponse)
 def return_book_route(
