@@ -7,8 +7,8 @@ class BookRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self):
-        return self.db.query(Book).all()
+    def get_all(self, skip: int = 0, limit: int = 10):
+        return self.db.query(Book).offset(skip).limit(limit).all()
     
     def get_by_isbn(self, isbn: str):
         return self.db.query(Book).filter(Book.isbn == isbn).first()
