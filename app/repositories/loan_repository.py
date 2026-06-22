@@ -29,8 +29,8 @@ class LoanRepository:
         self.db.refresh(db_loan)
         return db_loan
     
-    def get_ative_loans(self):
-        return self.db.query(Loan).filter(Loan.return_date == None).all()
+    def get_ative_loans(self, skip: int = 0, limit: int = 10):
+        return self.db.query(Loan).filter(Loan.return_date == None).offset(skip).limit(limit).all()
     
     def return_book(self, loan_id: int):
         db_loan = self.db.query(Loan).filter(
