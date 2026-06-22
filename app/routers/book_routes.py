@@ -9,7 +9,11 @@ from app.repositories.book_repository import BookRepository
 router = APIRouter(prefix="/book", tags=["Books"])
 
 @router.get("/", response_model=List[BookResponse])
-def list_book(db: Session = Depends(get_db)):
+def list_book(
+    skip: int = Query(0, ge=0, description="Numero de registros a pular (offset)"),
+    limit: int = Query(10, ge=1, le=100, description="Quantidade maxima de registros por pagina"),
+    db: Session = Depends(get_db)
+):
     repo = BookRepository(db)
     return repo.get_all()
 
@@ -55,7 +59,7 @@ def get_inventory_report(
     current_admin: User = Depends(get_current_admin)
 ):
     repo = BookRepository(db)
-    books = repo.get_all()
+    books = repo.get_all(skip=0, limit=1000)
 
     report = []
     for book in books:
