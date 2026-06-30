@@ -36,9 +36,9 @@ def return_book_route(
     db: Session = Depends(get_db),
     current_admin: User = Depends(get_current_admin)
 ):
-    loan_repo = LoanRepository(db)
-    updated_loan = loan_repo.return_book(loan_id)
-
+    service = LoanService(db)
+    updated_loan = service.return_book(loan_id)
+    
     if not updated_loan:
         raise HTTPException(
             status_code=400,
