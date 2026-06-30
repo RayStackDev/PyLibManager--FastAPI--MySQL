@@ -1,7 +1,9 @@
+from datetime import date
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.repositories.loan_repository import LoanRepository
 from app.repositories.book_repository import BookRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.loan import LoanCreate
 from app.models.user import User
 
@@ -10,6 +12,7 @@ class LoanService:
         self.db = db
         self.loan_repo = LoanRepository(db)
         self.book_repo = BookRepository(db)
+        self.user_repo = UserRepository(db)
 
     def create_loan(self, loan_data: LoanCreate, current_user: User):
         if current_user.is_blocked:
@@ -38,3 +41,25 @@ class LoanService:
             raise HTTPException(status_code=400, detail="Livro esgotado no estoque")
         
         return self.loan_repo.create_loan(loan_data, user_id=current_user.id)
+    
+    def return_book(self, loan_id: int):
+        db_loan = self.loan_repo.return_book(loan_id)
+        if not db_loan:
+            return None
+        
+        today = date.today()
+        if today > db_loan.due_date:
+            dias_atraso = (today - db_loan.due_date).days
+            valor_multa_diaria = 2.00
+            total_multa = dias_atraso * valor_multa_diaria
+
+            usuario = self.user_repo.get_by_id(db_loan.user_id)
+            if usuario:
+                self.user_repo.update_user(usuario.id, {"pending_fines": usuario.pending_fines + total_multa})
+
+        book = self.book_repo.get_by_id(db_loan.book_id)
+        if book:
+            self.book_repo.db.query(book.__class__).filter(book.__class__ == book.id).update({"stock": book.stock + 1})
+            self.db.commit()
+
+        return db_loan
