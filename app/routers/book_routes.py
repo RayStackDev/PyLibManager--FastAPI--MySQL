@@ -5,6 +5,7 @@ from app.dependencies import get_db, get_current_admin
 from app.models.user import User
 from app.schemas.book import BookCreate, BookResponse
 from app.repositories.book_repository import BookRepository
+from app.services.book_service import BookService
 
 router = APIRouter(prefix="/book", tags=["Books"])
 
@@ -29,10 +30,8 @@ def create_book(
     db: Session = Depends(get_db),
     current_admin: User = Depends(get_current_admin)
 ):
-    repo = BookRepository(db)
-    if repo.get_by_isbn(book.isbn):
-        raise HTTPException(status_code=400, detail="ISBN já cadastrado")
-    return repo.create(book)
+    service = BookService(db)
+    return service.create_book(book)
 
 @router.delete("/{book_id}")
 def delete_book_route(
